@@ -1,14 +1,7 @@
-// Root build.gradle — coordina el monorepo
-// Las tareas de build se delegan a los subproyectos
-
 // Tarea raíz que hace el build completo del monolito
 tasks.register('buildMonolith') {
     dependsOn ':frontend:buildFrontend', ':backend:build'
     description = 'Construye el frontend y luego el backend como monolito'
     group = 'build'
 
-    doLast {
-        println '✅ Monolito construido exitosamente.'
-        println '   Ejecuta: java -jar backend/build/libs/backend-1.0-SNAPSHOT.jar'
-    }
 }

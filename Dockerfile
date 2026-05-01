@@ -1,4 +1,4 @@
-# ─── Etapa 1: Build del Frontend ──────────────────────────────────────
+# Etapa 1: Build del Frontend
 FROM node:20-alpine AS frontend-build
 
 WORKDIR /app/frontend
@@ -9,7 +9,7 @@ RUN npm ci --prefer-offline
 COPY frontend/ ./
 RUN npm run build
 
-# ─── Etapa 2: Build del Backend Spring Boot ────────────────────────────────────
+# Etapa 2: Build del Backend Spring Boot
 FROM eclipse-temurin:21-jdk-alpine AS backend-build
 
 WORKDIR /app
@@ -28,7 +28,7 @@ COPY --from=frontend-build /app/frontend/dist backend/src/main/resources/static/
 # Construir el backend (sin la tarea copyFrontendBuild porque ya lo copiamos)
 RUN ./gradlew :backend:build -x test -x copyFrontendBuild --no-daemon
 
-# ─── Etapa 3: Imagen final de ejecución ───────────────────────────────────────
+# Etapa 3: Imagen final de ejecución
 FROM eclipse-temurin:21-jre-alpine AS runtime
 
 WORKDIR /app

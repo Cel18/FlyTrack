@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-  # ── Base de datos PostgreSQL ──────────────────────────────────────────────────
+  # Base de datos PostgreSQL
   db:
     image: postgres:15
     container_name: flytrack-db
@@ -21,7 +21,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # ──  FlyTrack (Backend Spring Boot + Frontend React) ────────────────
+  # FlyTrack (Backend Spring Boot + Frontend React)
   flytrack-app:
     build:
       context: .
