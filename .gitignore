@@ -1,0 +1,50 @@
+# ═══════════════════════════════════════════════════════════
+# .gitignore — FlyTrack (Backend + Frontend)
+# ═══════════════════════════════════════════════════════════
+
+# Gradle
+.gradle/
+build/
+backend/build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Frontend Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# Recursos estáticos generados 
+backend/src/main/resources/static/
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# VS Code
+.vscode/
+
+# Spring Tool Suite
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
