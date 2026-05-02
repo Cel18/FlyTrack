@@ -1,6 +1,7 @@
 package com.flytrack.back.service;
 
 import com.flytrack.back.exception.ResourceNotFoundException;
+import com.flytrack.back.model.Rol;
 import com.flytrack.back.model.Usuario;
 import com.flytrack.back.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,9 @@ public class UsuarioService {
     }
 
     public List<Usuario> getAll() {
-        return usuarioRepository.findAll();
+        return usuarioRepository.findAll().stream()
+                .filter(u -> u.getRol() != Rol.ADMIN)
+                .toList();
     }
 
     public Usuario getById(Long id) {

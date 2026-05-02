@@ -1,5 +1,6 @@
 package com.flytrack.back.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,12 +37,15 @@ public class Vuelo {
     private EstadoVuelo estadoVuelo = EstadoVuelo.PUNTUAL;
 
     /** Relación 1:1 con la puerta de embarque asignada a este vuelo. */
+    @JsonIgnore
     @OneToOne(mappedBy = "vuelo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private PuertaEmbarque puertaEmbarque;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "vuelo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Notificacion> listNotificaciones = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "vuelo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reporte> listReportes = new ArrayList<>();
 
@@ -49,6 +53,7 @@ public class Vuelo {
      * Pasajeros registrados en este vuelo.
      * Vuelo es el dueño de la tabla intermedia.
      */
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "vuelo_usuario", joinColumns = @JoinColumn(name = "vuelo_id"), inverseJoinColumns = @JoinColumn(name = "usuario_id"))
     private List<Usuario> usuarios = new ArrayList<>();
@@ -123,6 +128,7 @@ public class Vuelo {
         this.estadoVuelo = estadoVuelo;
     }
 
+    @JsonIgnore
     public PuertaEmbarque getPuertaEmbarque() {
         return puertaEmbarque;
     }
@@ -131,6 +137,7 @@ public class Vuelo {
         this.puertaEmbarque = puertaEmbarque;
     }
 
+    @JsonIgnore
     public List<Notificacion> getListNotificaciones() {
         return listNotificaciones;
     }
@@ -139,6 +146,7 @@ public class Vuelo {
         this.listNotificaciones = listNotificaciones;
     }
 
+    @JsonIgnore
     public List<Reporte> getListReportes() {
         return listReportes;
     }
@@ -147,6 +155,7 @@ public class Vuelo {
         this.listReportes = listReportes;
     }
 
+    @JsonIgnore
     public List<Usuario> getUsuarios() {
         return usuarios;
     }

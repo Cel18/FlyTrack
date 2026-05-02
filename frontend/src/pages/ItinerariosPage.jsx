@@ -64,8 +64,8 @@ export default function ItinerariosPage() {
                     <td className="vuelo-desc">{v.descripcion}</td>
                     <td><strong>{v.origen}</strong></td>
                     <td><strong>{v.destino}</strong></td>
-                    <td>{formatFecha(v.salida)}</td>
-                    <td>{formatFecha(v.llegada)}</td>
+                    <td>{formatFecha(v.horaPartida)}</td>
+                    <td>{formatFecha(v.horaLlegada)}</td>
                     <td><span className={`badge ${badge.cls}`}>{badge.label}</span></td>
                   </tr>
                 );

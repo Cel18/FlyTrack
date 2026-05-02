@@ -1,5 +1,6 @@
 package com.flytrack.back.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,12 +35,15 @@ public class Usuario {
     @Column(nullable = false)
     private EstadoCuenta estadoCuenta = EstadoCuenta.ACTIVO;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "destinatario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Notificacion> listNotificaciones = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Reporte> listReportes = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "usuarios", fetch = FetchType.LAZY)
     private List<Vuelo> listVuelos = new ArrayList<>();
 
@@ -103,6 +107,7 @@ public class Usuario {
         this.estadoCuenta = estadoCuenta;
     }
 
+    @JsonIgnore
     public List<Notificacion> getListNotificaciones() {
         return listNotificaciones;
     }
@@ -111,6 +116,7 @@ public class Usuario {
         this.listNotificaciones = listNotificaciones;
     }
 
+    @JsonIgnore
     public List<Reporte> getListReportes() {
         return listReportes;
     }
@@ -119,6 +125,7 @@ public class Usuario {
         this.listReportes = listReportes;
     }
 
+    @JsonIgnore
     public List<Vuelo> getListVuelos() {
         return listVuelos;
     }

@@ -14,6 +14,7 @@ async function request(path, options = {}) {
   return res.json();
 }
 
-export const get = (path) => request(path);
-export const post = (path, body) =>
-  request(path, { method: 'POST', body: JSON.stringify(body) });
+export const get  = (path)       => request(path);
+export const post = (path, body) => request(path, { method: 'POST',   body: JSON.stringify(body) });
+export const put  = (path, body) => request(path, { method: 'PUT',    body: JSON.stringify(body) });
+export const del  = (path)       => request(path, { method: 'DELETE' });

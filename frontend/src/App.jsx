@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import ItinerariosPage from './pages/ItinerariosPage.jsx';
 import NotificacionesPage from './pages/NotificacionesPage.jsx';
 import ReportesPage from './pages/ReportesPage.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 import './index.css';
 
 function Navbar() {
@@ -20,6 +21,9 @@ function Navbar() {
         <li><Link to="/itinerarios">Itinerarios</Link></li>
         {user && <li><Link to="/notificaciones">Notificaciones</Link></li>}
         {user && <li><Link to="/reportes">Equipaje</Link></li>}
+        {user?.rol === 'ADMIN' && (
+          <li><Link to="/admin" className="navbar-admin-link">⚙️ Admin</Link></li>
+        )}
       </ul>
       {user ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -109,9 +113,18 @@ function Footer() {
   );
 }
 
+/** Protege rutas que requieren cualquier usuario autenticado */
 function ProtectedRoute({ children }) {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" replace />;
+}
+
+/** Protege rutas exclusivas de ADMIN */
+function AdminRoute({ children }) {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.rol !== 'ADMIN') return <Navigate to="/" replace />;
+  return children;
 }
 
 export default function App() {
@@ -121,14 +134,17 @@ export default function App() {
         <div className="app-container">
           <Navbar />
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/itinerarios" element={<ItinerariosPage />} />
+            <Route path="/"             element={<HomePage />} />
+            <Route path="/login"        element={<LoginPage />} />
+            <Route path="/itinerarios"  element={<ItinerariosPage />} />
             <Route path="/notificaciones" element={
               <ProtectedRoute><NotificacionesPage /></ProtectedRoute>
             } />
             <Route path="/reportes" element={
               <ProtectedRoute><ReportesPage /></ProtectedRoute>
+            } />
+            <Route path="/admin" element={
+              <AdminRoute><AdminDashboard /></AdminRoute>
             } />
           </Routes>
           <Footer />

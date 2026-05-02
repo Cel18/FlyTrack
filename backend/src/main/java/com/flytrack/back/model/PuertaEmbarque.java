@@ -1,5 +1,6 @@
 package com.flytrack.back.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -23,8 +24,9 @@ public class PuertaEmbarque {
     private LocalDateTime fechaCierre;
 
     /** Vuelo al que está asignada esta puerta. PuertaEmbarque posee la FK. */
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "vuelo_id", nullable = false, unique = true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Vuelo vuelo;
 
     public PuertaEmbarque() {

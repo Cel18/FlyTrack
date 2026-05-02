@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:file:.env
   application:
     name: flytrack-backend
   datasource:
