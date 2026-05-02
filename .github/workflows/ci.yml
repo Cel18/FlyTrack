@@ -31,10 +31,23 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build with Gradle (Includes tests & frontend)
-        run: ./gradlew buildMonolith --no-daemon
+      - name: Run unit tests (JUnit)
+        run: ./gradlew :backend:test --no-daemon
 
-      - name: Upload Artifact
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: backend/build/test-results/test/*.xml
+
+      - name: Build frontend
+        run: ./gradlew :frontend:buildFrontend --no-daemon
+
+      - name: Build backend (skip tests)
+        run: ./gradlew :backend:build -x test --no-daemon
+
+      - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
           name: flytrack-monolith
