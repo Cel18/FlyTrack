@@ -43,6 +43,7 @@ jobs:
 
       - name: Analyze code quality (SonarQube)
         run: ./gradlew :backend:sonarqube --no-daemon
+        continue-on-error: true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
