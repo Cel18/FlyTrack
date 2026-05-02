@@ -8,6 +8,10 @@ jobs:
   docker-publish-and-deploy:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
 
     steps:
