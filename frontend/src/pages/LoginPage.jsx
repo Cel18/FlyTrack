@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState({ nombre: '', correo: '', password: '' });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
     try {
       if (mode === 'login') {
@@ -26,7 +28,7 @@ export default function LoginPage() {
         await register(form.nombre, form.correo, form.password);
         setMode('login');
         setForm({ nombre: '', correo: form.correo, password: '' });
-        setError('');
+        setSuccess('Cuenta creada exitosamente. Ahora puedes iniciar sesión.');
       }
     } catch (err) {
       setError(err.message);
@@ -80,6 +82,7 @@ export default function LoginPage() {
             />
           </div>
 
+          {success && <p className="form-success">{success}</p>}
           {error && <p className="form-error">{error}</p>}
 
           <button type="submit" className="btn btn-primary btn-full" disabled={loading}>

@@ -447,6 +447,12 @@ body {
   margin: 0;
 }
 
+.form-success {
+  color: #16a34a;
+  font-size: 14px;
+  margin: 0;
+}
+
 .btn-full {
   width: 100%;
 }
