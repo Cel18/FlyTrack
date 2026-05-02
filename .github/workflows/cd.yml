@@ -52,11 +52,11 @@ jobs:
           script: |
             cd ~/flytrack
             export FLYTRACK_IMAGE=ghcr.io/${{ steps.tag.outputs.owner }}/flytrack:${{ steps.tag.outputs.tag }}
-            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            export JWT_SECRET=${{ secrets.JWT_SECRET }}
-            export ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
-            export ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
+            export JWT_SECRET="${{ secrets.JWT_SECRET }}"
+            export ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL }}"
+            export ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}"
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
             docker image prune -f
