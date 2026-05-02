@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.sonarqube' version '5.0.0.4638'
 }
 
 group = 'com.flytrack'
@@ -45,20 +46,28 @@ test {
     useJUnitPlatform()
 }
 
+sonarqube {
+    properties {
+        property 'sonar.projectKey', 'flytrack-backend'
+        property 'sonar.projectName', 'FlyTrack Backend'
+        property 'sonar.sources', 'src/main/java'
+        property 'sonar.tests', 'src/test/java'
+    }
+}
+
 springBoot {
     mainClass = 'com.flytrack.back.FlyTrackApplication'
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Monolito: copia el build del frontend Angular a los recursos estáticos
+// Monolito: copia el build del frontend React a los recursos estáticos
 // del backend para que Spring Boot los sirva directamente.
 //
-// Angular (con outputPath="dist") genera:
-//   frontend/dist/browser/  → archivos para el navegador
+// Vite (React) genera: frontend/dist/
 //
 // Spring Boot sirve estáticos desde: classpath:/static/
 // ─────────────────────────────────────────────────────────────────────────────
-def frontendBrowserDir = project(':frontend').file('dist/browser')
+def frontendBrowserDir = project(':frontend').file('dist')
 def staticDir = layout.projectDirectory.dir('src/main/resources/static')
 
 tasks.register('copyFrontendBuild', Copy) {

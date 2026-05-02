@@ -41,6 +41,12 @@ jobs:
           name: test-results
           path: backend/build/test-results/test/*.xml
 
+      - name: Analyze code quality (SonarQube)
+        run: ./gradlew :backend:sonarqube --no-daemon
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
       - name: Build frontend
         run: ./gradlew :frontend:buildFrontend --no-daemon
 
