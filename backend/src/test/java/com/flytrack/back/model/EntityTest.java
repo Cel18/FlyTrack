@@ -35,15 +35,15 @@ class EntityTest {
         Usuario u = new Usuario("Test", "test@test.com", "pass", Rol.USER);
         u.setIdUsuario(1L);
         u.setEstadoCuenta(EstadoCuenta.ACTIVO);
-        u.setVuelos(new java.util.ArrayList<>());
+        u.setListVuelos(new java.util.ArrayList<>());
         
         assertEquals(1L, u.getIdUsuario());
         assertEquals("Test", u.getNombre());
         assertEquals("test@test.com", u.getCorreo());
-        assertEquals("pass", u.getContrasena());
+        assertEquals("pass", u.getPassword());
         assertEquals(Rol.USER, u.getRol());
         assertEquals(EstadoCuenta.ACTIVO, u.getEstadoCuenta());
-        assertNotNull(u.getVuelos());
+        assertNotNull(u.getListVuelos());
     }
     
     @Test
@@ -76,12 +76,12 @@ class EntityTest {
         Reporte r = new Reporte("Desc", new Usuario(), new Vuelo());
         r.setId(1L);
         r.setEstadoReporte(EstadoReporte.PENDIENTE);
-        r.setFechaReporte(LocalDateTime.now());
+        r.setFechaCreacion(LocalDateTime.now());
         
         assertEquals(1L, r.getId());
         assertEquals("Desc", r.getDescripcion());
         assertEquals(EstadoReporte.PENDIENTE, r.getEstadoReporte());
-        assertNotNull(r.getFechaReporte());
+        assertNotNull(r.getFechaCreacion());
         assertNotNull(r.getUsuario());
         assertNotNull(r.getVuelo());
     }
