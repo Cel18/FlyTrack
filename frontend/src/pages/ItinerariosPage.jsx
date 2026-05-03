@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getVuelos } from '../api/vuelos.js';
+import { getVuelos, getMisVuelos, suscribirVuelo, desuscribirVuelo } from '../api/vuelos.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const ESTADO_BADGE = {
   PUNTUAL: { label: 'Puntual', cls: 'badge-green' },
@@ -16,16 +17,49 @@ function formatFecha(iso) {
 }
 
 export default function ItinerariosPage() {
+  const { user } = useAuth();
   const [vuelos, setVuelos] = useState([]);
+  const [suscritos, setSuscritos] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [accion, setAccion] = useState({});
 
   useEffect(() => {
-    getVuelos()
-      .then(setVuelos)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+    const fetchData = async () => {
+      try {
+        const todos = await getVuelos();
+        setVuelos(todos);
+
+        if (user?.id) {
+          const mis = await getMisVuelos(user.id);
+          setSuscritos(new Set(mis.map((v) => v.idVuelo)));
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [user]);
+
+  const toggleSuscripcion = async (vueloId) => {
+    if (!user) return;
+    setAccion((prev) => ({ ...prev, [vueloId]: true }));
+    try {
+      if (suscritos.has(vueloId)) {
+        await desuscribirVuelo(vueloId, user.id);
+        setSuscritos((prev) => { const s = new Set(prev); s.delete(vueloId); return s; });
+      } else {
+        await suscribirVuelo(vueloId, user.id);
+        setSuscritos((prev) => new Set(prev).add(vueloId));
+      }
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setAccion((prev) => ({ ...prev, [vueloId]: false }));
+    }
+  };
 
   return (
     <main className="main-content page-section">
@@ -54,11 +88,14 @@ export default function ItinerariosPage() {
                 <th>Salida</th>
                 <th>Llegada</th>
                 <th>Estado</th>
+                {user && <th>Suscripción</th>}
               </tr>
             </thead>
             <tbody>
               {vuelos.map((v) => {
                 const badge = ESTADO_BADGE[v.estadoVuelo] ?? { label: v.estadoVuelo, cls: '' };
+                const suscrito = suscritos.has(v.idVuelo);
+                const cargando = accion[v.idVuelo];
                 return (
                   <tr key={v.idVuelo}>
                     <td className="vuelo-desc">{v.descripcion}</td>
@@ -67,6 +104,17 @@ export default function ItinerariosPage() {
                     <td>{formatFecha(v.horaPartida)}</td>
                     <td>{formatFecha(v.horaLlegada)}</td>
                     <td><span className={`badge ${badge.cls}`}>{badge.label}</span></td>
+                    {user && (
+                      <td>
+                        <button
+                          className={`btn-suscripcion ${suscrito ? 'suscrito' : ''}`}
+                          onClick={() => toggleSuscripcion(v.idVuelo)}
+                          disabled={cargando}
+                        >
+                          {cargando ? '...' : suscrito ? '✓ Suscrito' : 'Suscribirse'}
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 );
               })}

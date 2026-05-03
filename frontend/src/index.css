@@ -702,6 +702,42 @@ body {
   border-color: var(--primary-light);
 }
 
+/* --- Botón suscripción --- */
+.btn-suscripcion {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--primary-light);
+  background: transparent;
+  color: var(--primary-light);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.btn-suscripcion:hover:not(:disabled) {
+  background: var(--primary-light);
+  color: white;
+}
+
+.btn-suscripcion.suscrito {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #166534;
+}
+
+.btn-suscripcion.suscrito:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #991b1b;
+}
+
+.btn-suscripcion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .navbar-links {
