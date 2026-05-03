@@ -4,7 +4,10 @@ import com.flytrack.back.dto.VueloDTO;
 import com.flytrack.back.exception.BadRequestException;
 import com.flytrack.back.exception.ResourceNotFoundException;
 import com.flytrack.back.model.EstadoVuelo;
+import com.flytrack.back.model.Notificacion;
+import com.flytrack.back.model.Usuario;
 import com.flytrack.back.model.Vuelo;
+import com.flytrack.back.repository.NotificacionRepository;
 import com.flytrack.back.repository.VueloRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +31,12 @@ public class VueloServiceTest {
 
     @Mock
     private VueloRepository vueloRepository;
+
+    @Mock
+    private NotificacionRepository notificacionRepository;
+
+    @Mock
+    private UsuarioService usuarioService;
 
     @InjectMocks
     private VueloService vueloService;
@@ -125,5 +135,87 @@ public class VueloServiceTest {
         when(vueloRepository.findById(1L)).thenReturn(Optional.of(vueloMock));
         vueloService.delete(1L);
         verify(vueloRepository).delete(vueloMock);
+    }
+
+    @Test
+    void update_WhenStateChanges_ShouldCreateNotificationsForEachUser() {
+        Usuario u1 = new Usuario();
+        u1.setIdUsuario(1L);
+        Usuario u2 = new Usuario();
+        u2.setIdUsuario(2L);
+        vueloMock.setUsuarios(Arrays.asList(u1, u2));
+
+        VueloDTO dto = new VueloDTO("BOG", "MED", "Vuelo de prueba", partida, llegada, "RETRASADO");
+        when(vueloRepository.findById(1L)).thenReturn(Optional.of(vueloMock));
+        when(vueloRepository.save(any(Vuelo.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        vueloService.update(1L, dto);
+
+        verify(notificacionRepository, times(2)).save(any(Notificacion.class));
+    }
+
+    @Test
+    void update_WhenStateSame_ShouldNotCreateNotifications() {
+        VueloDTO dto = new VueloDTO("BOG", "MED", "Vuelo de prueba", partida, llegada, "PUNTUAL");
+        when(vueloRepository.findById(1L)).thenReturn(Optional.of(vueloMock));
+        when(vueloRepository.save(any(Vuelo.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        vueloService.update(1L, dto);
+
+        verify(notificacionRepository, never()).save(any(Notificacion.class));
+    }
+
+    @Test
+    void suscribir_WhenValid_ShouldAddUsuario() {
+        Usuario usuario = new Usuario();
+        usuario.setIdUsuario(2L);
+        vueloMock.setUsuarios(new ArrayList<>());
+
+        when(vueloRepository.findById(1L)).thenReturn(Optional.of(vueloMock));
+        when(usuarioService.getById(2L)).thenReturn(usuario);
+        when(vueloRepository.save(any(Vuelo.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        vueloService.suscribir(1L, 2L);
+
+        assertEquals(1, vueloMock.getUsuarios().size());
+        verify(vueloRepository).save(vueloMock);
+    }
+
+    @Test
+    void suscribir_WhenAlreadySubscribed_ShouldThrowException() {
+        Usuario usuario = new Usuario();
+        usuario.setIdUsuario(2L);
+        vueloMock.setUsuarios(new ArrayList<>(List.of(usuario)));
+
+        when(vueloRepository.findById(1L)).thenReturn(Optional.of(vueloMock));
+        when(usuarioService.getById(2L)).thenReturn(usuario);
+
+        assertThrows(BadRequestException.class, () -> vueloService.suscribir(1L, 2L));
+        verify(vueloRepository, never()).save(any());
+    }
+
+    @Test
+    void desuscribir_WhenSubscribed_ShouldRemoveUsuario() {
+        Usuario usuario = new Usuario();
+        usuario.setIdUsuario(2L);
+        vueloMock.setUsuarios(new ArrayList<>(List.of(usuario)));
+
+        when(vueloRepository.findById(1L)).thenReturn(Optional.of(vueloMock));
+        when(vueloRepository.save(any(Vuelo.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        vueloService.desuscribir(1L, 2L);
+
+        assertTrue(vueloMock.getUsuarios().isEmpty());
+        verify(vueloRepository).save(vueloMock);
+    }
+
+    @Test
+    void desuscribir_WhenNotSubscribed_ShouldThrowException() {
+        vueloMock.setUsuarios(new ArrayList<>());
+
+        when(vueloRepository.findById(1L)).thenReturn(Optional.of(vueloMock));
+
+        assertThrows(BadRequestException.class, () -> vueloService.desuscribir(1L, 99L));
+        verify(vueloRepository, never()).save(any());
     }
 }
