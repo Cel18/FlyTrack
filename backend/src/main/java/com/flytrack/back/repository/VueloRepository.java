@@ -8,4 +8,5 @@ import java.util.List;
 public interface VueloRepository extends JpaRepository<Vuelo, Long> {
     List<Vuelo> findByEstadoVuelo(EstadoVuelo estadoVuelo);
     List<Vuelo> findByOrigenAndDestino(String origen, String destino);
+    List<Vuelo> findByUsuariosIdUsuario(Long idUsuario);
 }

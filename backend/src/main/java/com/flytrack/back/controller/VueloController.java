@@ -31,6 +31,12 @@ public class VueloController {
         return ResponseEntity.ok(vueloService.getById(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getById(#usuarioId).correo")
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<Vuelo>> getByUsuario(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(vueloService.getByUsuarioId(usuarioId));
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Vuelo> create(@Valid @RequestBody VueloDTO request) {
@@ -47,6 +53,20 @@ public class VueloController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         vueloService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getById(#usuarioId).correo")
+    @PostMapping("/{id}/usuarios/{usuarioId}")
+    public ResponseEntity<Void> suscribir(@PathVariable Long id, @PathVariable Long usuarioId) {
+        vueloService.suscribir(id, usuarioId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or authentication.name == @usuarioService.getById(#usuarioId).correo")
+    @DeleteMapping("/{id}/usuarios/{usuarioId}")
+    public ResponseEntity<Void> desuscribir(@PathVariable Long id, @PathVariable Long usuarioId) {
+        vueloService.desuscribir(id, usuarioId);
         return ResponseEntity.noContent().build();
     }
 }

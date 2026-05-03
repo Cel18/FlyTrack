@@ -1,2 +1,3 @@
 # FlyTrack
-Backend de la aplicación FlyTrack del proyecto AeroPuerto Smart. Proporciona APIs REST para la gestión de itinerarios de vuelos, notificaciones a pasajeros y reporte de incidencias de equipaje. Desarrollado con Spring Boot, implementa buenas prácticas de arquitectura, pruebas automatizadas e integración continua mediante pipelines DevOps.
+FlyTrack es una aplicación web desarrollada para el AeroPuerto Smart que permite a los pasajeros consultar itinerarios de vuelo, recibir notificaciones sobre cambios, conocer su puerta de embarque y reportar inconvenientes con su equipaje.
+El proyecto está construido con Spring Boot y PostgreSQL en el backend, en el frontend utiliza React; aplica prácticas DevOps como CI/CD con GitHub Actionsr y análisis de calidad con SonarCloud.
