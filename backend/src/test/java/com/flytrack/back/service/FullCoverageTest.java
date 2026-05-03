@@ -52,7 +52,7 @@ class FullCoverageTest {
 
     @Test
     void testUsuarioService() {
-        Usuario user = new Usuario("Test", "test@test.com", "pass", Rol.USUARIO);
+        Usuario user = new Usuario("Test", "test@test.com", "pass", Rol.USER);
         user.setIdUsuario(1L);
 
         when(usuarioRepository.findAll()).thenReturn(List.of(user));
