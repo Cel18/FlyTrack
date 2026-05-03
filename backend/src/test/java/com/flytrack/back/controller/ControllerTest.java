@@ -71,7 +71,8 @@ class ControllerTest {
     
     @Test
     void testUsuarioController() {
-        Usuario u = new Usuario();
+        Usuario u = new Usuario("Test", "test@test.com", "pass", Rol.USER);
+        u.setIdUsuario(1L);
         when(usuarioService.getAll()).thenReturn(List.of(u));
         assertEquals(HttpStatus.OK, usuarioController.getAll().getStatusCode());
         assertEquals(HttpStatus.NO_CONTENT, usuarioController.delete(1L).getStatusCode());
