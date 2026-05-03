@@ -32,7 +32,10 @@ public class SpaController {
             "/{path:[^\\.]*}",
             "/{path:^(?!api|swagger-ui|v3).*$}/**/{subPath:[^\\.]*}"
     })
-    public ResponseEntity<Resource> forward(HttpServletRequest request) throws IOException {
+    public ResponseEntity<Resource> forward(
+            @org.springframework.web.bind.annotation.PathVariable(required = false) String path,
+            @org.springframework.web.bind.annotation.PathVariable(required = false) String subPath,
+            HttpServletRequest request) throws IOException {
         Resource resource = new ClassPathResource(INDEX_HTML);
         return ResponseEntity.ok()
                 .contentType(MediaType.TEXT_HTML)
