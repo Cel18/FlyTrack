@@ -1,6 +1,7 @@
 package com.flytrack.back.service;
 
 import com.flytrack.back.dto.VueloDTO;
+import com.flytrack.back.exception.BadRequestException;
 import com.flytrack.back.exception.ResourceNotFoundException;
 import com.flytrack.back.model.EstadoVuelo;
 import com.flytrack.back.model.Vuelo;
@@ -13,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,13 +32,24 @@ public class VueloServiceTest {
     private VueloService vueloService;
 
     private Vuelo vueloMock;
+    private LocalDateTime partida;
+    private LocalDateTime llegada;
 
     @BeforeEach
     void setUp() {
-        vueloMock = new Vuelo("BOG", "MED", "Vuelo de prueba", 
-                LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(1).plusHours(1));
+        partida = LocalDateTime.now().plusDays(1);
+        llegada = partida.plusHours(1);
+        vueloMock = new Vuelo("BOG", "MED", "Vuelo de prueba", partida, llegada);
         vueloMock.setIdVuelo(1L);
         vueloMock.setEstadoVuelo(EstadoVuelo.PUNTUAL);
+    }
+
+    @Test
+    void getAll_ShouldReturnList() {
+        when(vueloRepository.findAll()).thenReturn(Arrays.asList(vueloMock));
+        List<Vuelo> result = vueloService.getAll();
+        assertEquals(1, result.size());
+        verify(vueloRepository).findAll();
     }
 
     @Test
@@ -60,8 +74,7 @@ public class VueloServiceTest {
 
     @Test
     void shouldCreateFlightSuccessfully() {
-        VueloDTO dto = new VueloDTO("BOG", "MED", "Vuelo de prueba", 
-                LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(1).plusHours(1), "PUNTUAL");
+        VueloDTO dto = new VueloDTO("BOG", "MED", "Vuelo de prueba", partida, llegada, "PUNTUAL");
 
         when(vueloRepository.save(any(Vuelo.class))).thenReturn(vueloMock);
 
@@ -70,5 +83,47 @@ public class VueloServiceTest {
         assertNotNull(result);
         assertEquals(EstadoVuelo.PUNTUAL, result.getEstadoVuelo());
         verify(vueloRepository, times(1)).save(any(Vuelo.class));
+    }
+
+    @Test
+    void create_WhenArrivalBeforeDeparture_ShouldThrowException() {
+        VueloDTO dto = new VueloDTO("BOG", "MED", "Desc", llegada, partida, "PUNTUAL");
+        assertThrows(BadRequestException.class, () -> vueloService.create(dto));
+    }
+
+    @Test
+    void create_WithNullStatus_ShouldDefaultToPuntual() {
+        VueloDTO dto = new VueloDTO("BOG", "MED", "Desc", partida, llegada, null);
+        when(vueloRepository.save(any(Vuelo.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Vuelo result = vueloService.create(dto);
+        assertEquals(EstadoVuelo.PUNTUAL, result.getEstadoVuelo());
+    }
+
+    @Test
+    void update_WhenValid_ShouldUpdate() {
+        VueloDTO dto = new VueloDTO("CLO", "CTG", "Updated", partida, llegada, "RETRASADO");
+        when(vueloRepository.findById(1L)).thenReturn(Optional.of(vueloMock));
+        when(vueloRepository.save(any(Vuelo.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Vuelo result = vueloService.update(1L, dto);
+
+        assertEquals("CLO", result.getOrigen());
+        assertEquals("CTG", result.getDestino());
+        assertEquals(EstadoVuelo.RETRASADO, result.getEstadoVuelo());
+    }
+
+    @Test
+    void update_WhenArrivalBeforeDeparture_ShouldThrowException() {
+        VueloDTO dto = new VueloDTO("BOG", "MED", "Desc", llegada, partida, "PUNTUAL");
+        when(vueloRepository.findById(1L)).thenReturn(Optional.of(vueloMock));
+        assertThrows(BadRequestException.class, () -> vueloService.update(1L, dto));
+    }
+
+    @Test
+    void delete_WhenExists_ShouldDelete() {
+        when(vueloRepository.findById(1L)).thenReturn(Optional.of(vueloMock));
+        vueloService.delete(1L);
+        verify(vueloRepository).delete(vueloMock);
     }
 }

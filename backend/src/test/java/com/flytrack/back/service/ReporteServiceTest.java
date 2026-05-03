@@ -1,6 +1,7 @@
 package com.flytrack.back.service;
 
 import com.flytrack.back.dto.ReporteDTO;
+import com.flytrack.back.exception.ResourceNotFoundException;
 import com.flytrack.back.model.EstadoReporte;
 import com.flytrack.back.model.Reporte;
 import com.flytrack.back.model.Usuario;
@@ -13,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,6 +56,44 @@ public class ReporteServiceTest {
     }
 
     @Test
+    void getAll_ShouldReturnList() {
+        when(reporteRepository.findAll()).thenReturn(Arrays.asList(reporteMock));
+        List<Reporte> result = reporteService.getAll();
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void shouldReturnReporteById() {
+        when(reporteRepository.findById(1L)).thenReturn(Optional.of(reporteMock));
+
+        Reporte result = reporteService.getById(1L);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        verify(reporteRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void getById_WhenNotFound_ShouldThrowException() {
+        when(reporteRepository.findById(1L)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> reporteService.getById(1L));
+    }
+
+    @Test
+    void getByUsuarioId_ShouldReturnList() {
+        when(reporteRepository.findByUsuarioIdUsuario(1L)).thenReturn(Arrays.asList(reporteMock));
+        List<Reporte> result = reporteService.getByUsuarioId(1L);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void getByVueloId_ShouldReturnList() {
+        when(reporteRepository.findByVueloIdVuelo(1L)).thenReturn(Arrays.asList(reporteMock));
+        List<Reporte> result = reporteService.getByVueloId(1L);
+        assertEquals(1, result.size());
+    }
+
+    @Test
     void shouldCreateReporteSuccessfully() {
         ReporteDTO dto = new ReporteDTO("Maleta perdida", 1L, 1L);
 
@@ -69,13 +110,19 @@ public class ReporteServiceTest {
     }
 
     @Test
-    void shouldReturnReporteById() {
+    void updateEstado_ShouldUpdate() {
         when(reporteRepository.findById(1L)).thenReturn(Optional.of(reporteMock));
+        when(reporteRepository.save(any(Reporte.class))).thenAnswer(i -> i.getArgument(0));
 
-        Reporte result = reporteService.getById(1L);
+        Reporte result = reporteService.updateEstado(1L, "FINALIZADO");
 
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        verify(reporteRepository, times(1)).findById(1L);
+        assertEquals(EstadoReporte.FINALIZADO, result.getEstadoReporte());
+    }
+
+    @Test
+    void delete_ShouldCallRepository() {
+        when(reporteRepository.findById(1L)).thenReturn(Optional.of(reporteMock));
+        reporteService.delete(1L);
+        verify(reporteRepository).delete(reporteMock);
     }
 }
