@@ -1,0 +1,63 @@
+name: CI FlyTrack
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package.json'
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Run unit tests (JUnit)
+        run: ./gradlew :backend:test --no-daemon
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: backend/build/test-results/test/*.xml
+
+      - name: Analyze code quality (SonarQube)
+        run: ./gradlew :backend:sonar --no-daemon
+        continue-on-error: true
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: Build frontend
+        run: ./gradlew :frontend:buildFrontend --no-daemon
+
+      - name: Build backend (skip tests)
+        run: ./gradlew :backend:build -x test --no-daemon
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flytrack-monolith
+          path: backend/build/libs/*.jar

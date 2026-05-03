@@ -1,0 +1,7 @@
+// Tarea raíz que hace el build completo del monolito
+tasks.register('buildMonolith') {
+    dependsOn ':frontend:buildFrontend', ':backend:build'
+    description = 'Construye el frontend y luego el backend como monolito'
+    group = 'build'
+
+}

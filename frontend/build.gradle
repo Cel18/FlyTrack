@@ -1,0 +1,37 @@
+plugins {
+    id 'base'
+    id 'com.github.node-gradle.node' version '7.0.2'
+}
+
+node {
+    download = false
+}
+
+tasks.register('installFrontend', NpmTask) {
+    description = 'Instala las dependencias npm de React'
+    group = 'build'
+    args = ['install']
+    inputs.file('package.json')
+    outputs.dir('node_modules')
+}
+
+tasks.register('buildFrontend', NpmTask) {
+    description = 'Compila el frontend React con Vite'
+    group = 'build'
+    dependsOn 'installFrontend'
+    args = ['run', 'build']
+    inputs.dir('src')
+    inputs.file('vite.config.js')
+    inputs.file('package.json')
+    outputs.dir('dist')
+}
+
+tasks.register('serveFrontend', NpmTask) {
+    description = 'Inicia el servidor de desarrollo de Vite'
+    group = 'development'
+    args = ['run', 'dev']
+}
+
+tasks.named('clean') {
+    delete 'dist', 'node_modules'
+}
