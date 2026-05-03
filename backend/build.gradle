@@ -48,8 +48,8 @@ test {
 
 sonarqube {
     properties {
-        property 'sonar.projectKey', 'flytrack-backend'
-        property 'sonar.projectName', 'FlyTrack Backend'
+        property 'sonar.projectKey', 'Cel18_FlyTrack'
+        property 'sonar.organization', 'cel18'
         property 'sonar.sources', 'src/main/java'
         property 'sonar.tests', 'src/test/java'
     }
