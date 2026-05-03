@@ -38,14 +38,14 @@ class ControllerTest {
     @Test
     void testAuthController() {
         LoginRequestDTO req = new LoginRequestDTO("test@test.com", "pass");
-        AuthResponseDTO res = new AuthResponseDTO("token", "USER", "Test", "test@test.com");
+        AuthResponseDTO res = new AuthResponseDTO(1L, "token", "test@test.com", "USER", "Test");
         when(authService.login(any())).thenReturn(res);
 
         ResponseEntity<AuthResponseDTO> response = authController.login(req);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("token", response.getBody().token());
         
-        RegisterRequestDTO reg = new RegisterRequestDTO("Test", "test@test.com", "pass");
+        RegisterRequestDTO reg = new RegisterRequestDTO("Test", "test@test.com", "pass", "USER");
         ResponseEntity<?> regResp = authController.register(reg);
         assertEquals(HttpStatus.OK, regResp.getStatusCode());
     }
@@ -107,7 +107,7 @@ class ControllerTest {
         
         ReporteDTO dto = new ReporteDTO("D", 1L, 1L);
         assertEquals(HttpStatus.CREATED, reporteController.create(dto).getStatusCode());
-        assertEquals(HttpStatus.OK, reporteController.updateEstado(1L, EstadoReporte.RESUELTO).getStatusCode());
+        assertEquals(HttpStatus.OK, reporteController.updateEstado(1L, java.util.Map.of("estado", "FINALIZADO")).getStatusCode());
     }
 
     @Test
